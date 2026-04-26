@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deer qlisha</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Dancing+Script:wght@400;700&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --rose: #c0396b;
+    --blush: #f9c6d5;
+    --deep: #6b1a35;
+    --cream: #fff8f0;
+    --gold: #d4a055;
+    --petal: #fde8f0;
+  }
+
+  body {
+    background: var(--cream);
+    font-family: 'Lato', sans-serif;
+    color: #3a1a2a;
+    overflow-x: hidden;
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ctext y='24' font-size='22'%3E🌹%3C/text%3E%3C/svg%3E"), auto;
+  }
+
+  /* ===================== PASSWORD SCREEN ===================== */
+  #passwordScreen {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--deep);
+    overflow: hidden;
+  }
+
+  #passwordScreen::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 30% 40%, rgba(192,57,107,0.35) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 70%, rgba(212,160,85,0.15) 0%, transparent 50%);
+  }
+
+  .pw-petals {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .pw-petal {
+    position: absolute;
+    border-radius: 50% 0 50% 0;
+    opacity: 0.18;
+    animation: fall linear infinite;
+  }
+
+  @keyframes fall {
+    0%   { transform: translateY(-30px) rotate(0deg); opacity: 0.2; }
+    100% { transform: translateY(110vh)  rotate(360deg); opacity: 0; }
+  }
+
+  .pw-box {
+    position: relative;
+    z-index: 1;
+    background: rgba(255,248,240,0.06);
+    border: 1px solid rgba(249,198,213,0.25);
+    border-radius: 28px;
+    padding: 56px 44px 48px;
+    text-align: center;
+    max-width: 380px;
+    width: 90%;
+    backdrop-filter: blur(12px);
+    animation: fadeUp 0.9s ease forwards;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .pw-rose { font-size: 3.2rem; display: block; margin-bottom: 18px; animation: heartbeat 1.8s ease infinite; }
+
+  @keyframes heartbeat {
+    0%,100% { transform: scale(1); }
+    50%      { transform: scale(1.18); }
+  }
+
+  .pw-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    color: #fff8f0;
+    margin-bottom: 6px;
+  }
+
+  .pw-subtitle {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.1rem;
+    color: var(--blush);
+    margin-bottom: 36px;
+    opacity: 0.85;
+  }
+
+  .pw-dots {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    margin-bottom: 32px;
+  }
+
+  .pw-dot {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: 2px solid rgba(249,198,213,0.5);
+    background: transparent;
+    transition: all 0.25s;
+  }
+
+  .pw-dot.filled {
+    background: var(--rose);
+    border-color: var(--rose);
+    box-shadow: 0 0 10px rgba(192,57,107,0.6);
+  }
+
+  .pw-keypad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    max-width: 260px;
+    margin: 0 auto 20px;
+  }
+
+  .pw-key {
+    padding: 16px 0;
+    background: rgba(255,248,240,0.08);
+    border: 1px solid rgba(249,198,213,0.2);
+    border-radius: 14px;
+    color: #fff8f0;
+    font-size: 1.3rem;
+    font-family: 'Playfair Display', serif;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    user-select: none;
+  }
+
+  .pw-key:hover { background: rgba(192,57,107,0.3); }
+  .pw-key:active { transform: scale(0.93); }
+
+  .pw-key.zero { grid-column: 2; }
+  .pw-key.del  { grid-column: 3; font-size: 1rem; background: rgba(192,57,107,0.15); }
+
+  .pw-error {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1rem;
+    color: #f4a0b0;
+    min-height: 24px;
+    margin-top: 4px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .pw-error.show { opacity: 1; }
+
+  /* ===================== MUSIC BAR ===================== */
+  #musicBar {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 500;
+    background: white;
+    border: 1px solid #f0d0dd;
+    border-radius: 50px;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 8px 30px rgba(192,57,107,0.2);
+    font-family: 'Lato', sans-serif;
+    font-size: 0.82rem;
+    color: var(--deep);
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+
+  #musicBar:hover { transform: translateY(-2px); }
+
+  .music-icon {
+    font-size: 1.1rem;
+    animation: spin 2s linear infinite;
+  }
+
+  @keyframes spin {
+    0%   { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .music-icon.paused { animation: none; }
+
+  .music-info { line-height: 1.3; }
+  .music-name { font-weight: 700; color: var(--rose); font-size: 0.8rem; }
+  .music-artist { color: #9a5065; font-size: 0.75rem; }
+
+  /* ===================== MAIN SITE ===================== */
+  #mainSite { display: none; }
+
+  .petals-bg {
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none; z-index: 0; overflow: hidden;
+  }
+
+  .petal {
+    position: absolute;
+    border-radius: 50% 0 50% 0;
+    background: var(--blush);
+    opacity: 0.5;
+    animation: fall linear infinite;
+  }
+
+  .container {
+    position: relative; z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 20px 80px;
+  }
+
+  .hero {
+    text-align: center;
+    padding: 80px 20px 60px;
+  }
+
+  .hero-subtitle {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.4rem; color: var(--rose);
+    letter-spacing: 2px; margin-bottom: 16px;
+    opacity: 0; animation: fadeUp 1s ease 0.3s forwards;
+  }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 7vw, 5rem);
+    font-weight: 700; color: var(--deep);
+    line-height: 1.1; margin-bottom: 24px;
+    opacity: 0; animation: fadeUp 1s ease 0.6s forwards;
+  }
+
+  .hero-title span { color: var(--rose); font-style: italic; }
+
+  .hero-heart {
+    font-size: 3rem; display: inline-block;
+    opacity: 0;
+    animation: heartbeat 1.5s ease infinite, fadeUp 1s ease 0.9s forwards;
+  }
+
+  .letter-section {
+    background: white; border-radius: 24px;
+    padding: 50px 40px; margin: 40px 0;
+    box-shadow: 0 20px 60px rgba(192,57,107,0.12);
+    border: 1px solid #f0d0dd;
+    position: relative; overflow: hidden;
+  }
+
+  .letter-section::before {
+    content: '"';
+    position: absolute; top: -20px; left: 30px;
+    font-family: 'Playfair Display', serif;
+    font-size: 15rem; color: var(--petal);
+    line-height: 1; z-index: 0;
+  }
+
+  .letter-section * { position: relative; z-index: 1; }
+
+  .section-label {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.1rem; color: var(--rose);
+    letter-spacing: 3px; text-transform: uppercase; margin-bottom: 8px;
+  }
+
+  .letter-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem; color: var(--deep); margin-bottom: 24px;
+  }
+
+  .letter-section p {
+    font-size: 1.1rem; line-height: 1.9;
+    color: #5a3040; margin-bottom: 18px;
+  }
+
+  .letter-section p strong { color: var(--rose); font-style: italic; }
+
+  /* ===================== PHOTOS ===================== */
+  .photos-section { margin: 60px 0; }
+
+  .photos-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem; color: var(--deep);
+    text-align: center; margin-bottom: 8px;
+  }
+
+  .photos-section .section-label { text-align: center; margin-bottom: 40px; }
+
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 36px 28px;
+  }
+
+  .photo-card {
+    position: relative; border-radius: 20px;
+    overflow: visible;
+    transition: transform 0.3s ease;
+  }
+
+  .photo-card:hover { transform: translateY(-5px); }
+
+.photo-frame {
+  width: 100%;
+  height: 400px; /* 👈 increase this value (e.g. 400px, 500px, 600px) */
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 35px rgba(192,57,107,0.18);
+  border: 1px solid #f0d0dd;
+  background: #fde8f0;
+}
+
+  .photo-frame img {
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+  }
+.photo-caption {
+  margin-top: 14px;
+  font-family: 'Dancing Script', cursive;
+  font-size: 1.2rem;
+  color: var(--rose);
+  text-align: center;
+  background: transparent;
+  border: none;
+  border-bottom: 1.5px dashed rgba(192,57,107,0.35);
+  width: 100%;
+
+  padding: 12px 10px;
+  min-height: 80px;   /* 👈 increase this */
+  height: auto;       /* 👈 allow growth */
+  line-height: 1.6;
+
+  resize: none;
+  overflow: auto;     /* 👈 allows scrolling if needed */
+}
+
+  .photo-caption::placeholder { color: rgba(192,57,107,0.4); }
+
+  /* ===================== SONGS ===================== */
+  .songs-section { margin: 60px 0; }
+
+  .songs-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem; color: var(--deep);
+    text-align: center; margin-bottom: 8px;
+  }
+
+  .songs-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px; margin-top: 40px;
+  }
+
+  .song-card {
+    background: white; border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 8px 30px rgba(192,57,107,0.1);
+    border: 1px solid #f0d0dd;
+    transition: transform 0.3s, box-shadow 0.3s;
+    position: relative; overflow: hidden;
+  }
+
+  .song-card:last-child { grid-column: 1 / -1; }
+  .song-card:hover { transform: translateY(-5px); box-shadow: 0 20px 50px rgba(192,57,107,0.2); }
+
+  .song-icon { font-size: 2.5rem; margin-bottom: 12px; display: block; }
+
+  .song-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem; color: var(--deep);
+    font-weight: 700; margin-bottom: 4px;
+  }
+
+  .song-artist {
+    font-size: 0.85rem; color: var(--rose);
+    margin-bottom: 12px; letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .song-reason { font-size: 0.95rem; color: #7a4050; line-height: 1.6; font-style: italic; }
+
+  .play-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin-top: 14px; padding: 8px 20px;
+    background: var(--rose); color: white;
+    border: none; border-radius: 50px;
+    font-size: 0.85rem; cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.2s;
+    font-family: 'Lato', sans-serif;
+  }
+
+  .play-btn:hover { background: var(--deep); transform: scale(1.05); }
+
+  /* ===================== REASONS ===================== */
+  .reasons-section { margin: 60px 0; }
+
+  .reasons-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem; color: var(--deep);
+    text-align: center; margin-bottom: 8px;
+  }
+
+  .reasons-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 40px; }
+
+  .reason-card {
+    background: white; border-radius: 16px;
+    padding: 24px; border-left: 4px solid var(--rose);
+    box-shadow: 0 4px 20px rgba(192,57,107,0.08);
+    transition: transform 0.3s;
+  }
+
+  .reason-card:hover { transform: translateX(6px); }
+
+  .reason-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem; color: var(--blush);
+    font-weight: 700; line-height: 1; margin-bottom: 8px;
+  }
+
+  .reason-text { font-size: 1rem; color: #5a3040; line-height: 1.6; }
+
+  /* ===================== PROMISE ===================== */
+  .promise-section {
+    background: linear-gradient(135deg, var(--deep) 0%, var(--rose) 100%);
+    border-radius: 24px; padding: 50px 40px;
+    margin: 60px 0; color: white; text-align: center;
+    position: relative; overflow: hidden;
+  }
+
+  .promise-section::before {
+    content: '♥ ♥ ♥';
+    position: absolute; top: 20px; left: 0; right: 0;
+    text-align: center; font-size: 1rem;
+    opacity: 0.3; letter-spacing: 20px;
+  }
+
+  .promise-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem; margin-bottom: 20px;
+  }
+
+  .promise-section p { font-size: 1.1rem; line-height: 1.9; opacity: 0.9; max-width: 600px; margin: 0 auto; }
+
+  /* ===================== QUESTION ===================== */
+  .question-section { text-align: center; padding: 60px 20px; }
+
+  .question-box {
+    background: white; border-radius: 24px;
+    padding: 50px 40px;
+    box-shadow: 0 20px 60px rgba(192,57,107,0.15);
+    border: 2px solid var(--blush);
+    max-width: 600px; margin: 0 auto; position: relative;
+  }
+
+  .question-text {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.4rem, 3.5vw, 2rem);
+    color: var(--deep); font-weight: 700;
+    margin-bottom: 16px; line-height: 1.4;
+  }
+
+  .question-subtitle { font-size: 0.95rem; color: #9a5065; margin-bottom: 36px; font-style: italic; }
+
+  .answer-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+  .btn-yes {
+    padding: 16px 40px;
+    background: linear-gradient(135deg, var(--rose), var(--deep));
+    color: white; border: none; border-radius: 50px;
+    font-size: 1.15rem; font-family: 'Dancing Script', cursive;
+    cursor: pointer; transition: transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0 8px 25px rgba(192,57,107,0.4);
+    animation: pulse-yes 2s ease infinite;
+  }
+
+  @keyframes pulse-yes {
+    0%,100% { box-shadow: 0 8px 25px rgba(192,57,107,0.4); }
+    50%      { box-shadow: 0 8px 40px rgba(192,57,107,0.7); }
+  }
+
+  .btn-yes:hover { transform: scale(1.08) translateY(-3px); }
+
+  .btn-no {
+    padding: 16px 40px; background: white;
+    color: #9a5065; border: 2px solid #f0d0dd;
+    border-radius: 50px; font-size: 1.15rem;
+    font-family: 'Dancing Script', cursive;
+    cursor: pointer; transition: all 0.3s; position: relative;
+  }
+
+  .btn-no:hover { background: #fff0f5; }
+
+  /* ===================== OVERLAYS ===================== */
+  .response-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(107,26,53,0.8); z-index: 1000;
+    align-items: center; justify-content: center;
+    backdrop-filter: blur(6px);
+  }
+
+  .response-overlay.active { display: flex; }
+
+  .response-box {
+    background: white; border-radius: 24px;
+    padding: 50px 40px; text-align: center;
+    max-width: 420px; width: 90%;
+    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  @keyframes popIn {
+    from { transform: scale(0.5); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+  }
+
+  .response-emoji { font-size: 4rem; display: block; margin-bottom: 16px; }
+
+  .response-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem; color: var(--deep); margin-bottom: 12px;
+  }
+
+  .response-msg { font-size: 1rem; color: #7a4050; line-height: 1.6; margin-bottom: 24px; }
+
+  .close-btn {
+    padding: 12px 32px; background: var(--rose);
+    color: white; border: none; border-radius: 50px;
+    font-size: 1rem; cursor: pointer;
+    font-family: 'Lato', sans-serif; transition: background 0.2s;
+  }
+
+  .close-btn:hover { background: var(--deep); }
+
+  /* ===================== CONFETTI ===================== */
+  .confetti-piece {
+    position: fixed; width: 10px; height: 10px;
+    top: -10px; opacity: 0;
+    animation: confettiFall 4s ease forwards;
+    z-index: 2000; border-radius: 2px;
+  }
+
+  @keyframes confettiFall {
+    0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* ===================== TIMELINE ===================== */
+  .timeline-section { margin: 60px 0; }
+
+  .timeline-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem; color: var(--deep);
+    text-align: center; margin-bottom: 40px;
+  }
+
+  .timeline { position: relative; padding-left: 40px; }
+
+  .timeline::before {
+    content: ''; position: absolute;
+    left: 14px; top: 0; bottom: 0; width: 2px;
+    background: linear-gradient(to bottom, var(--rose), var(--blush));
+  }
+
+  .tl-item {
+    position: relative; margin-bottom: 32px;
+    padding: 20px 24px; background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(192,57,107,0.08);
+    border: 1px solid #f0d0dd;
+  }
+
+  .tl-item::before {
+    content: '♥'; position: absolute;
+    left: -36px; top: 20px;
+    color: var(--rose); font-size: 1.2rem;
+    background: var(--cream);
+  }
+
+  .tl-time { font-family: 'Dancing Script', cursive; font-size: 1rem; color: var(--rose); margin-bottom: 4px; }
+  .tl-text { font-size: 0.95rem; color: #5a3040; line-height: 1.6; }
+
+  /* ===================== MISC ===================== */
+  .reveal {
+    opacity: 0; transform: translateY(40px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  .divider {
+    text-align: center; margin: 40px 0;
+    color: var(--rose); font-size: 1.2rem;
+    letter-spacing: 12px; opacity: 0.5;
+  }
+
+  footer {
+    text-align: center; padding: 40px;
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.3rem; color: var(--rose);
+  }
+
+  @media (max-width: 600px) {
+    .photo-grid { grid-template-columns: repeat(2, 1fr); }
+    .songs-grid { grid-template-columns: 1fr; }
+    .reasons-grid { grid-template-columns: 1fr; }
+    .song-card:last-child { grid-column: unset; }
+    .letter-section { padding: 30px 20px; }
+    .promise-section { padding: 40px 20px; }
+    .pw-box { padding: 40px 24px 36px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===================== PASSWORD SCREEN ===================== -->
+<div id="passwordScreen">
+  <div class="pw-petals" id="pwPetals"></div>
+  <div class="pw-box">
+    <span class="pw-rose">🌹</span>
+    <div class="pw-title">I am scared</div>
+    <div class="pw-subtitle">Ye passcode sirf tumhe hi pta hai</div>
+
+    <div class="pw-dots">
+      <div class="pw-dot" id="d0"></div>
+      <div class="pw-dot" id="d1"></div>
+      <div class="pw-dot" id="d2"></div>
+      <div class="pw-dot" id="d3"></div>
+    </div>
+
+    <div class="pw-keypad">
+      <button class="pw-key" onclick="pwPress('1')">1</button>
+      <button class="pw-key" onclick="pwPress('2')">2</button>
+      <button class="pw-key" onclick="pwPress('3')">3</button>
+      <button class="pw-key" onclick="pwPress('4')">4</button>
+      <button class="pw-key" onclick="pwPress('5')">5</button>
+      <button class="pw-key" onclick="pwPress('6')">6</button>
+      <button class="pw-key" onclick="pwPress('7')">7</button>
+      <button class="pw-key" onclick="pwPress('8')">8</button>
+      <button class="pw-key" onclick="pwPress('9')">9</button>
+      <button class="pw-key zero" onclick="pwPress('0')">0</button>
+      <button class="pw-key del" onclick="pwDel()">⌫</button>
+    </div>
+
+    <div class="pw-error" id="pwError">Galat code hai🥺</div>
+  </div>
+</div>
+
+<!-- ===================== BACKGROUND MUSIC ===================== -->
+<!--
+  HOW TO ADD THE SONG:
+  1. Download "Abhi Na Jao Chor Kar" MP3 and name it: song.mp3
+  2. Put song.mp3 in the SAME folder as this HTML file
+  3. Done! It will play automatically.
+-->
+<audio id="bgMusic" loop>
+  <source src="song.mp3" type="audio/mpeg">
+</audio>
+
+<!-- Music control bar -->
+<div id="musicBar" style="display:none;" onclick="toggleMusic()">
+  <span class="music-icon" id="musicIcon">🎵</span>
+  <div class="music-info">
+    <div class="music-name">Abhi Na Jao Chor Kar</div>
+    <div class="music-artist">Muhammad Rafi · click to play</div>
+  </div>
+  <span id="musicToggleLabel" style="font-size:0.8rem; color:var(--rose); margin-left:4px;">▶</span>
+</div>
+
+<!-- ===================== MAIN SITE ===================== -->
+<div id="mainSite">
+
+<div class="petals-bg" id="petals"></div>
+
+<div class="container">
+
+  <!-- HERO -->
+  <div class="hero">
+    <p class="hero-subtitle">You complete me</p>
+    <h1 class="hero-title">I <span>want</span> to say smth</h1>
+    <div class="hero-heart" style="font-size:3rem; display:inline-block; animation: heartbeat 1.5s ease infinite;">🌹</div>
+  </div>
+
+  <!-- APOLOGY LETTER -->
+  <div class="letter-section reveal">
+    <p class="section-label"></p>
+    <h2>Hello Qlisha</h2>
+    <p>
+      Main janta hoon ke mujhse galti hui. Aur koi bhi lafz is baat ko theek nahi kar sakta jo tumhe hurt hua lekin phir bhi, <strong>dil se maafi maangta hoon.</strong>
+    </p>
+    <p>
+      Tum mere liye sirf koi nahi ho tum woh roshni ho jo meri zindagi ko meaning deti ho. Har baar jab main tumhara chehra dekhta hoon, samajh aata hai ke kuch cheezein zindagi mein sach mein keemat rakhti hain. <strong>Aur tum un sabse ooper ho.</strong>
+    </p>
+    <p>
+      Jo hua, iske liye main sharminda hoon. Tumhara gussa bilkul sahi tha. Main chahta hoon ke tum jano <strong>tum woh hissa ho jise main kisi bhi haal mein khona nahi chahta.</strong>
+    </p>
+    <p>
+      Ek mauka do mujhe. Phir se woh muskaan vapas layunga tumhare chehre par — woh muskaan jispe mujhe fakhr hai.
+      <strong>Qbdullah here </strong>
+    </p>
+  </div>
+
+  <div class="divider">✦ ✦ ✦</div>
+
+  <!-- OUR PHOTOS -->
+  <div class="photos-section reveal">
+    <p class="section-label"></p>
+    <h2>My days with you</h2>
+    <div class="photo-grid">
+
+      <!-- PHOTO 1 -->
+      <div class="photo-card">
+        <div class="photo-frame">
+          <img src="photo1.jpg" alt="Our photo">
+        </div>
+        <textarea class="photo-caption" placeholder="jab hum pehli dafa milay the kisay pta tha tum eik din mere liye sb se important ho jao gi thulla bhi aap ne hi sikhaya tha "></textarea>
+      </div>
+
+      <!-- PHOTO 2 -->
+      <div class="photo-card">
+        <div class="photo-frame">
+          <img src="photo2.jpg" alt="Our photo">
+        </div>
+        <textarea class="photo-caption" placeholder="ye humara sb se acha din 10/10 day tha androon gye the issay me kese bhool skta hu"></textarea>
+      </div>
+
+      <!-- PHOTO 3 -->
+      <div class="photo-card">
+        <div class="photo-frame">
+          <img src="photo3.jpg" alt="Our photo">
+        </div>
+        <textarea class="photo-caption" placeholder="Aray wah hum dono kitne achay lg rhe is me dhang ki tasveer"></textarea>
+      </div>
+
+      <!-- PHOTO 4 -->
+      <div class="photo-card">
+        <div class="photo-frame">
+          <img src="photo4.jpg" alt="Our photo">
+        </div>
+        <textarea class="photo-caption" placeholder="maaf kr dein madam jee bs ese hi humesha aap k samnay maafi mangta run ga"></textarea>
+      </div>
+
+      <!-- PHOTO 5 -->
+      <div class="photo-card">
+        <div class="photo-frame">
+          <img src="photo5.jpg" alt="Our photo">
+        </div>
+        <textarea class="photo-caption" placeholder="aap ka sath mere liye bht important hai shukriya maam har cheez k liye"></textarea>
+      </div>
+
+      <!-- PHOTO 6 -->
+      <div class="photo-card">
+        <div class="photo-frame">
+          <img src="photo6.jpg" alt="Our photo">
+        </div>
+        <textarea class="photo-caption" placeholder="humari sb se last picture meri gallery me jb hum butlers gye the mere sath kya aap ese hi stuffed chicken khanay butlers chalein gi?"></textarea>
+        
+      </div>
+
+    </div>
+  </div>
+
+  <div class="divider">✦ ✦ ✦</div>
+
+ 
+  <!-- REASONS -->
+  <div class="reasons-section reveal">
+    <p class="section-label" style="text-align:center;"></p>
+    <h2>Abhi na jao chor kar:(</h2>
+    <div class="reasons-grid">
+      <div class="reason-card">
+        <div class="reason-num">01</div>
+        <div class="reason-text">Tumhari woh muskaan jab tum sachchi khush hoti ho tumhar aankhein bhi muskurati hain. </div>
+      </div>
+      <div class="reason-card">
+        <div class="reason-num">02</div>
+        <div class="reason-text">Tumhari awaz jab tum baat karte ho sab kuch thoda acha lagta hai..</div>
+      </div>
+      <div class="reason-card">
+        <div class="reason-num">03</div>
+        <div class="reason-text">Tumhara dil sb se acha hai apnay se ziada logon ka sochti ho.</div>
+      </div>
+      <div class="reason-card">
+        <div class="reason-num">04</div>
+        <div class="reason-text">Tum jesa koi bhi nae hai is duniya me aur na kbhi ho skta hai</div>
+      </div>
+      <div class="reason-card">
+        <div class="reason-num">05</div>
+        <div class="reason-text">Tumhara gussa bhi honestly cute lagta hai(dantna nae). Lekin is waqt main sachchi sharmainda hoon. Tumhara dil dukhana nahi chahta tha.</div>
+      </div>
+      <div class="reason-card">
+        <div class="reason-num">06</div>
+        <div class="reason-text">Tum mere saath ho toh lagta hai ke sab theek hai. Tum nahi hoti toh ek khaali si jagah rehti hai jo koi aur nahi bhar sakta.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROMISE -->
+  <div class="promise-section reveal">
+    <h2>Mera Vaada</h2>
+    <p>
+      Main vaada karta hoon ke aage se zyada dhyan rakhunga tumhare feelings ka, tumhari baaton ka.
+      Tum deserve karti ho koi aisa jo tumhe kabhi hurt na kare. Main koshish karunga ke woh insaan banoon.
+     <strong>Qbdullah tariq:(</strong>
+    </p>
+  </div>
+
+  <!-- TIMELINE -->
+  <div class="timeline-section reveal">
+    <h2>Some words</h2>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-time">Pehla day</div>
+        <div class="tl-text">Jab pehli baar mila tha soch bhi nahi sakta tha ke yeh insaan itna khas hoga mere liye. Zindagi ka woh turn jo sab badal gaya.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-time">Pehla shugal</div>
+        <div class="tl-text">Jab tumne pehli baar mujhpe hanse woh awaaz abhi bhi yaad hai. Sochta hoon ke woh moment repeat karna chahta hoon baar baar.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-time">Tumhara wo sath dena </div>
+        <div class="tl-text">Jitna tum ne mera sath diya hai utna koi bhi nae de skta kbhi bhi chahay jo marzi ho jaye.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-time">Aaj </div>
+        <div class="tl-text">Aaj gustaakhi ke baad dil si dua hai ke tum maafi do. Yeh chapter khatam nahi karna chahta. Tumhare saath bahut aage jaana hai.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUESTION -->
+  <div class="question-section reveal">
+    <div class="question-box">
+      <div style="font-size:2.5rem; margin-bottom:16px;">🌹💌🌹</div>
+      <div class="question-text">Kal aap mere saath butlers chalein gi?</div>
+      <div class="question-subtitle">Khana main khilaonga aur haan  maafi bhi maangloga in person 🙏</div>
+      <div class="answer-btns">
+        <button class="btn-yes" onclick="showResponse('yes')">💖 Han, Chalungi!</button>
+        <button class="btn-no" id="noBtn" onclick="moveNoBtn()">😤 Chup Ho</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<!-- YES RESPONSE -->
+<div class="response-overlay" id="yesOverlay">
+  <div class="response-box">
+    <span class="response-emoji">🎉🌹💕</span>
+    <div class="response-title">Shukriya jee</div>
+    <div class="response-msg">
+      Thank you deer
+\
+    </div>
+    <button class="close-btn" onclick="closeOverlay('yesOverlay')">💌 Thik Hai!</button>
+  </div>
+</div>
+
+<!-- NO RESPONSE -->
+<div class="response-overlay" id="noOverlay">
+  <div class="response-box">
+    <span class="response-emoji">🥺</span>
+    <div class="response-title">Qbdullah roo rha ho ga</div>
+    </div>
+    <button class="close-btn" onclick="closeOverlay('noOverlay')">Thik Hai Soch Leti Hoon 😤</button>
+  </div>
+</div>
+
+<footer>
+  <span style="font-size:0.9rem; opacity:0.7;">Made with dard aur pyar</span>
+</footer>
+
+</div><!-- /mainSite -->
+
+<script>
+/* ====== PASSWORD ====== */
+const CORRECT = '2316';
+let pwInput = '';
+
+// Password screen petals
+const pwP = document.getElementById('pwPetals');
+const pColors = ['#f9c6d5','#fde8f0','#fcc2d7','#f8b4c8'];
+for(let i=0;i<18;i++){
+  const p=document.createElement('div');
+  p.className='pw-petal';
+  p.style.cssText=`left:${Math.random()*100}%;width:${8+Math.random()*14}px;height:${8+Math.random()*14}px;background:${pColors[Math.floor(Math.random()*pColors.length)]};animation-duration:${6+Math.random()*10}s;animation-delay:${Math.random()*8}s;top:-20px;`;
+  pwP.appendChild(p);
+}
+
+function pwPress(d){
+  if(pwInput.length>=4) return;
+  pwInput+=d;
+  document.getElementById('d'+(pwInput.length-1)).classList.add('filled');
+  if(pwInput.length===4){
+    setTimeout(()=>{
+      if(pwInput===CORRECT){ unlockSite(); }
+      else { wrongPw(); }
+    },200);
+  }
+}
+
+function pwDel(){
+  if(pwInput.length===0) return;
+  pwInput=pwInput.slice(0,-1);
+  document.getElementById('d'+pwInput.length).classList.remove('filled');
+  document.getElementById('pwError').classList.remove('show');
+}
+
+function wrongPw(){
+  document.getElementById('pwError').classList.add('show');
+  // shake dots
+  for(let i=0;i<4;i++){
+    const d=document.getElementById('d'+i);
+    d.style.background='#e24b4a';
+    setTimeout(()=>{d.style.background='';d.classList.remove('filled');},600);
+  }
+  pwInput='';
+}
+
+function unlockSite(){
+  const ps=document.getElementById('passwordScreen');
+  ps.style.transition='opacity 0.8s ease';
+  ps.style.opacity='0';
+  setTimeout(()=>{
+    ps.style.display='none';
+    document.getElementById('mainSite').style.display='block';
+    document.getElementById('musicBar').style.display='flex';
+    startMusic();
+    initSite();
+  },800);
+}
+
+/* ====== MUSIC ====== */
+let musicPlaying = false;
+const audio = document.getElementById('bgMusic');
+
+function startMusic(){
+  // Browsers require a user gesture before audio plays.
+  // The password "Enter" button IS a user gesture, so this should work.
+  audio.volume = 0.7;
+  const playPromise = audio.play();
+  if(playPromise !== undefined){
+    playPromise.then(()=>{
+      musicPlaying = true;
+      document.getElementById('musicIcon').classList.remove('paused');
+      document.getElementById('musicToggleLabel').textContent = '⏸';
+      document.querySelector('.music-artist').textContent = 'Muhammad Rafi';
+    }).catch(()=>{
+      // Autoplay blocked — show "tap to play" hint
+      musicPlaying = false;
+      document.querySelector('.music-artist').textContent = 'Tap to play 🎵';
+    });
+  }
+}
+
+function toggleMusic(){
+  if(musicPlaying){
+    audio.pause();
+    musicPlaying = false;
+    document.getElementById('musicIcon').classList.add('paused');
+    document.getElementById('musicToggleLabel').textContent = '▶';
+  } else {
+    audio.play();
+    musicPlaying = true;
+    document.getElementById('musicIcon').classList.remove('paused');
+    document.getElementById('musicToggleLabel').textContent = '⏸';
+    document.querySelector('.music-artist').textContent = 'Muhammad Rafi';
+  }
+}
+
+/* ====== MAIN SITE INIT ====== */
+function initSite(){
+  // Floating petals
+  const petalsContainer = document.getElementById('petals');
+  const colors = ['#f8b4c8','#fcd5ce','#f9c6d5','#fde8f0','#fcc2d7'];
+  for(let i=0;i<25;i++){
+    const p=document.createElement('div');
+    p.className='petal';
+    p.style.cssText=`left:${Math.random()*100}%;width:${6+Math.random()*14}px;height:${6+Math.random()*14}px;background:${colors[Math.floor(Math.random()*colors.length)]};animation-duration:${5+Math.random()*10}s;animation-delay:${Math.random()*10}s;border-radius:${Math.random()>0.5?'50% 0 50% 0':'50%'};opacity:${0.3+Math.random()*0.4};`;
+    petalsContainer.appendChild(p);
+  }
+
+  // Scroll reveal
+  const reveals=document.querySelectorAll('.reveal');
+  const observer=new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); });
+  },{threshold:0.1});
+  reveals.forEach(r=>observer.observe(r));
+}
+
+
+
+/* ====== RESPONSES ====== */
+function showResponse(type){
+  if(type==='yes'){
+    document.getElementById('yesOverlay').classList.add('active');
+    spawnConfetti();
+  } else {
+    document.getElementById('noOverlay').classList.add('active');
+  }
+}
+
+function closeOverlay(id){
+  document.getElementById(id).classList.remove('active');
+}
+
+/* ====== "CHUP HO" BUTTON ====== */
+let noMoves=0;
+function moveNoBtn(){
+  noMoves++;
+  if(noMoves>=1){ showResponse('no'); return; }
+  const btn=document.getElementById('noBtn');
+  const parent=btn.parentElement;
+  const maxX=parent.getBoundingClientRect().width-btn.getBoundingClientRect().width-20;
+  const randX=(Math.random()-0.5)*maxX;
+  const randY=(Math.random()-0.5)*80;
+  btn.style.transform=`translate(${randX}px, ${randY}px)`;
+  btn.style.transition='transform 0.3s ease';
+}
+
+/* ====== CONFETTI ====== */
+function spawnConfetti(){
+  const cols=['#c0396b','#f8b4c8','#d4a055','#6b1a35','#fcd5ce','#ffffff'];
+  for(let i=0;i<60;i++){
+    setTimeout(()=>{
+      const c=document.createElement('div');
+      c.className='confetti-piece';
+      c.style.cssText=`left:${Math.random()*100}vw;background:${cols[Math.floor(Math.random()*cols.length)]};width:${6+Math.random()*10}px;height:${6+Math.random()*10}px;border-radius:${Math.random()>0.5?'50%':'2px'};animation-duration:${3+Math.random()*2}s;animation-delay:${Math.random()*0.5}s;`;
+      document.body.appendChild(c);
+      setTimeout(()=>c.remove(),5000);
+    },i*40);
+  }
+}
+</script>
+</body>
+</html>
